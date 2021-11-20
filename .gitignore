@@ -1,0 +1,7 @@
+*.out
+/html
+/obj
+*.o
+app_normal_sem
+app_deadlock_release
+*.orig
