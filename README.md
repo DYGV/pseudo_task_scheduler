@@ -12,6 +12,9 @@ make all
 Then, you can run `./app_normal_sem` and `./app_deadlock_release`.
 
 ## Documents
+[Doxygen](https://www.doxygen.nl/download.html#gitrepos) must be installed on your computer to document.
 ```shell
 doxygen
 ```
+#### Optional packages
+- [Graphviz](https://graphviz.org/download/)
