@@ -65,8 +65,11 @@ void schedule(void) {
 static void __schedule(void) {
     // readyが空かつwaitが空でないとき = 起きていて走らせられるタスクがない
     // アイドルタスクを動かす
-    while ((running = pop_ready_queue()) == NULL && sleeper > 0) {
-        idle(); // 今回はセマフォを開放するタスク
+    // 今回はセマフォを解放するタスクをアイドルタスクとする
+    while (((running = pop_ready_queue()) == NULL) && sleeper > 0) {
+        printf("No task to run. Try to wakeup all task.\n");
+        idle();
+        printf("ok. Released all semaphore.\n");
     }
     running->task();
     // タスクを抜けたときにRUN状態ならREADYキューへ、
@@ -95,6 +98,9 @@ static struct semaphore* search_semaphore(unsigned int* sem) {
  * @return void
  */
 void __wake_up(unsigned int* sem) {
+    if(sleeper == 0){
+        return;
+    }
     // 該当のセマフォを探す
     struct semaphore* concerned_sem = search_semaphore(sem);
     // 該当のセマフォのウェイトキューからTCBを取り出す
@@ -107,7 +113,7 @@ void __wake_up(unsigned int* sem) {
     sleeper--;
     // ↓ 優先度付きのときは以下も一緒に使って、優先度に応じてreadyに行くかrunに行くか決めれば良い
     // 実行権を譲る。現在のタスクを手放して眠っているタスクに明け渡せるようにする
-    //add_to_ready_queue(running);
+    // add_to_ready_queue(running);
     // 眠っている方(wait)から取り出す(run状態に)
     // running = pop_front(&concerned_sem->wait_queue);
     // if(running == NULL) return;
@@ -128,6 +134,7 @@ void __sleep_on(unsigned int* sem) {
     // 該当のセマフォのウェイトキューへTCBを入れる
     push_back(&concerned_sem->wait_queue, running);
     sleeper++;
+    //running = NULL;
 }
 
 /**
@@ -140,7 +147,7 @@ void __sem_init(unsigned int* sem) {
     struct semaphore* new_sem;
     // セマフォごとにstruct semaphoreの領域を確保する
     if ((new_sem = (struct semaphore*)calloc(1, sizeof(struct semaphore))) == NULL) {
-        perror("malloc");
+        perror("calloc");
         exit(1);
     }
     new_sem->sem = sem;
@@ -161,8 +168,10 @@ static void idle(void) {
     // 強制的にセマフォを開放して起こす
     struct semaphore* concerned_sem = (struct semaphore*)isem_head;
     while (concerned_sem != NULL) {
-        (*concerned_sem->sem)--; // down操作の完了
-        __wake_up(concerned_sem->sem);
+        while(concerned_sem->wait_queue.size != 0){
+            __wake_up(concerned_sem->sem);
+        }
+        (*concerned_sem->sem) = 1;
         concerned_sem = concerned_sem->next;
     }
 }
