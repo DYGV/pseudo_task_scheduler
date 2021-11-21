@@ -8,16 +8,16 @@
 static sem_t sem;
 
 void TaskA() {
-    static int prg_cnt = 0;
+    static int pc = 0;
     int ret = 0;
-    if (prg_cnt == 0) {
+    if (pc == 0) {
         ret = sem_wait(&sem);
-    } else if (prg_cnt == 1) {
+    } else if (pc == 1) {
         printf("hello from A\n");
     }
     if (ret == 1) {
         printf("A\n");
-        prg_cnt++;
+        pc++;
     }
 }
 
@@ -26,18 +26,18 @@ void TaskB() {
 }
 
 void TaskC() {
-    static int prg_cnt = 0;
+    static int pc = 0;
     int ret = 0;
-    if (prg_cnt == 0) {
+    if (pc == 0) {
         ret = sem_wait(&sem);
-    } else if (prg_cnt == 1) {
+    } else if (pc == 1) {
         ret = sem_post(&sem);
-    } else if (prg_cnt == 2) {
+    } else if (pc == 2) {
         printf("hello from C\n");
     }
     if (ret == 1) {
         printf("C\n");
-        prg_cnt++;
+        pc++;
     }
 }
 
