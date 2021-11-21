@@ -1,7 +1,6 @@
 *.out
 /html
 /obj
+/bin
 *.o
-app_normal_sem
-app_deadlock_release
 *.orig

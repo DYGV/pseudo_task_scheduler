@@ -9,7 +9,7 @@ cd task_scheduler
 ```shell
 make all
 ```
-Then, you can run `./app_normal_sem` and `./app_deadlock_release`.
+Then, you can run `./bin/normal_sem`, `./bin/single_sem_deadlock_and_release` and `/bin/multi_sem_deadlock_and_release`.
 
 ## Documents
 [Doxygen](https://www.doxygen.nl/download.html#gitrepos) must be installed on your computer to document.
