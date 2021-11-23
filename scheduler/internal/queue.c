@@ -41,6 +41,8 @@ struct TCB* pop_front(struct Queue* queue) {
     queue->head = queue->head->next;
     // 取り出したのでsizeをデクリメント
     queue->size--;
+    // ノードの取り出しなのでnextを切り離す
+    head->next = NULL;
     return head;
 }
 

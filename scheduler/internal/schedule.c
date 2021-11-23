@@ -98,7 +98,7 @@ static struct semaphore* search_semaphore(unsigned int* sem) {
  * @return void
  */
 void __wake_up(unsigned int* sem) {
-    if(sleeper == 0){
+    if (sleeper == 0) {
         return;
     }
     // 該当のセマフォを探す
@@ -168,7 +168,7 @@ static void idle(void) {
     // 強制的にセマフォを開放して起こす
     struct semaphore* concerned_sem = (struct semaphore*)isem_head;
     while (concerned_sem != NULL) {
-        while(concerned_sem->wait_queue.size != 0){
+        while (concerned_sem->wait_queue.size != 0) {
             __wake_up(concerned_sem->sem);
         }
         (*concerned_sem->sem) = 1;
