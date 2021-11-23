@@ -29,10 +29,8 @@ int sem_init(sem_t* sem, unsigned int value) {
  */
 int sem_post(sem_t* sem) {
     *sem += 1;
-    if (*sem >= 1) {
-        // 1以上ならとりあえず眠っているタスクがあるか探してみる
-        __wake_up(sem);
-    }
+    // とりあえず眠っているタスクがあるか探してみる
+    __wake_up(sem);
     return 1;
 }
 
@@ -43,7 +41,7 @@ int sem_post(sem_t* sem) {
  * @see __sleep_on(unsigned int* sem)
  */
 int sem_wait(sem_t* sem) {
-    if (*sem <= 0) {
+    if (*sem == 0) {
         __sleep_on(sem);
         return -1;
     }
