@@ -9,7 +9,7 @@ cd task_scheduler
 ```shell
 make all
 ```
-Then, you can run `./bin/normal_sem`, `./bin/single_sem_deadlock_and_release` and `./bin/multi_normal_sem`.
+Then, you can run `./bin/single_normal_sem`, `./bin/single_sem_deadlock_and_release` and `./bin/multi_normal_sem`.
 
 ## Documents
 [Doxygen](https://www.doxygen.nl/download.html#gitrepos) must be installed on your computer to document.
