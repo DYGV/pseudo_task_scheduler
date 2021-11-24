@@ -11,6 +11,7 @@ static void __schedule(void);
 static void idle(void);
 static void add_ready_queue(struct TCB* node);
 static struct TCB* pop_ready_queue(void);
+static struct semaphore* search_semaphore(unsigned int* sem);
 
 //! 内部処理用のセマフォ構造体
 struct semaphore {
@@ -27,9 +28,9 @@ static struct TCB* running = {0};
 //! readyキュー
 static struct Queue ready_queue = {0};
 //! 内部処理用のセマフォ変数
-static struct semaphore isem = {0};
-//! isemの先頭アドレスの保持用ポインタ変数
-static const struct semaphore* isem_head = &isem;
+static struct semaphore* isem;
+//! isemの先頭アドレスの保持用変数
+static struct semaphore* isem_head;
 //! 眠っているタスクの総数
 static int sleeper = 0;
 
@@ -72,6 +73,7 @@ static void __schedule(void) {
         printf("ok. Released all semaphore.\n");
     }
     running->task();
+    printf("----------------\n");
     // タスクを抜けたときにRUN状態ならREADYキューへ、
     if (running->state == RUN) {
         add_ready_queue(running);
@@ -84,7 +86,7 @@ static void __schedule(void) {
  * @return struct semaphore* 検索結果
  */
 static struct semaphore* search_semaphore(unsigned int* sem) {
-    struct semaphore* concerned_sem = (struct semaphore*)isem_head;
+    struct semaphore* concerned_sem = isem_head;
     while (concerned_sem != NULL && concerned_sem->sem != sem) {
         concerned_sem = concerned_sem->next;
     }
@@ -105,20 +107,14 @@ void __wake_up(unsigned int* sem) {
     struct semaphore* concerned_sem = search_semaphore(sem);
     // 該当のセマフォのウェイトキューからTCBを取り出す
     struct TCB* tcb = pop_front(&concerned_sem->wait_queue);
-    // 今回はwaitからreadyに行くものとする
     if (tcb == NULL) {
         return;
     }
+    // 今回はwaitからreadyに行くものとする
     add_ready_queue(tcb);
+    // 起こしたのでsleeperを減らす
     sleeper--;
-    // ↓ 優先度付きのときは以下も一緒に使って、優先度に応じてreadyに行くかrunに行くか決めれば良い
-    // 実行権を譲る。現在のタスクを手放して眠っているタスクに明け渡せるようにする
-    // add_to_ready_queue(running);
-    // 眠っている方(wait)から取り出す(run状態に)
-    // running = pop_front(&concerned_sem->wait_queue);
-    // if(running == NULL) return;
-    // running->task();
-    // add_to_ready_queue(running);
+    printf("ID %dを状態%dへ遷移. \n", tcb->id, tcb->state);
 }
 
 /**
@@ -133,8 +129,9 @@ void __sleep_on(unsigned int* sem) {
     running->state = WAIT;
     // 該当のセマフォのウェイトキューへTCBを入れる
     push_back(&concerned_sem->wait_queue, running);
+    // 眠らせたのでsleeperを増やす
     sleeper++;
-    //running = NULL;
+    printf("ID %dを状態%dへ遷移. \n", running->id, running->state);
 }
 
 /**
@@ -151,9 +148,15 @@ void __sem_init(unsigned int* sem) {
         exit(1);
     }
     new_sem->sem = sem;
-    isem.next = new_sem;
+    new_sem->next = NULL;
+    if(isem == NULL){
+        isem = new_sem;
+        isem_head = new_sem;
+        return;
+    }
+    isem->next = new_sem;
     // 変数をnextに更新する(先頭ポインタはグローバル変数で保持しているから大丈夫)
-    isem = *isem.next;
+    isem = isem->next;
 }
 
 /**
@@ -163,11 +166,11 @@ void __sem_init(unsigned int* sem) {
  * @return void
  */
 static void idle(void) {
-    // レジスタとレジスタの値を交換するだけ(nop)
-    // asm("xchgl %eax, %eax");
-    // 強制的にセマフォを開放して起こす
+    // 強制的にセマフォを解放して起こす
     struct semaphore* concerned_sem = (struct semaphore*)isem_head;
+    // struct semaphoreについて
     while (concerned_sem != NULL) {
+        // struct semaphoreのウェイトキューについて
         while (concerned_sem->wait_queue.size != 0) {
             __wake_up(concerned_sem->sem);
         }
@@ -182,9 +185,10 @@ static void idle(void) {
  * @return void
  */
 static void add_ready_queue(struct TCB* node) {
-    if (node != NULL) {
-        node->state = READY;
+    if(node == NULL){
+        return;
     }
+    node->state = READY;
     push_back(&ready_queue, node);
 }
 
