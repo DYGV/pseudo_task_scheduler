@@ -136,7 +136,7 @@ void __wake_up(unsigned int* sem) {
     add_ready_queue(tcb);
     // 起こしたのでsleeperを減らす
     sleeper--;
-    printf("ID %dを状態%dへ遷移. \n", tcb->id, tcb->state);
+    printf("Task%dを状態%dへ遷移\n", tcb->id, tcb->state);
 }
 
 /**
@@ -153,7 +153,7 @@ void __sleep_on(unsigned int* sem) {
     push_back(&concerned_sem->wait_queue, running);
     // 眠らせたのでsleeperを増やす
     sleeper++;
-    printf("ID %dを状態%dへ遷移. \n", running->id, running->state);
+    printf("Task%dを状態%dへ遷移\n", running->id, running->state);
 }
 
 /**
