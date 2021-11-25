@@ -6,17 +6,19 @@ BINDIR = ./bin
 APP_1 = single_sem
 APP_2 = single_sem_idle
 APP_3 = multi_sem
+APP_4 = multi_sem_idle
 
-T_APP_1 := $(addprefix $(BINDIR)/, $(APP_1))
+T_APP_1 := $(BINDIR)/$(APP_1)
 T_APP_2 := $(BINDIR)/$(APP_2)
 T_APP_3 := $(BINDIR)/$(APP_3)
+T_APP_4 := $(BINDIR)/$(APP_4)
 
 SRCROOT = ./scheduler
 SRCDIRS := $(SRCROOT)/api $(SRCROOT)/internal
 SRCS = $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.c))
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.c=.o)) 
 
-all: $(T_APP_1) $(T_APP_2) $(T_APP_3)
+all: $(T_APP_1) $(T_APP_2) $(T_APP_3) $(T_APP_4)
 
 $(T_APP_1): $(OBJS)
 	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_1).c
@@ -26,6 +28,9 @@ $(T_APP_2): $(OBJS)
 
 $(T_APP_3): $(OBJS)
 	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_3).c
+
+$(T_APP_4): $(OBJS)
+	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_4).c
 
 $(OBJDIR)/%.o: %.c
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
