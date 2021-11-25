@@ -3,9 +3,9 @@ INCLUDE = -I./scheduler/api/include -I./scheduler/internal/include
 CFLGAGS = -Wall -g $(INCLUDE)
 OBJDIR = ./obj
 BINDIR = ./bin
-APP_1 = single_normal_sem
-APP_2 = single_sem_deadlock_and_release
-APP_3 = multi_normal_sem
+APP_1 = single_sem
+APP_2 = single_sem_idle
+APP_3 = multi_sem
 
 T_APP_1 := $(addprefix $(BINDIR)/, $(APP_1))
 T_APP_2 := $(BINDIR)/$(APP_2)
