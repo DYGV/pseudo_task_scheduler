@@ -9,8 +9,11 @@ cd task_scheduler
 ```shell
 make all
 ```
-Then, you can run `./bin/single_sem`, `./bin/single_sem_idle` and `./bin/multi_sem`.
-
+The generated executable is as follows:
+- `./bin/single_sem`
+- `./bin/single_sem_idle`
+- `./bin/multi_sem`
+-  `./bin/multi_sem_idle`
 ## Documents
 [Doxygen](https://www.doxygen.nl/download.html#gitrepos) must be installed on your computer to document.
 ```shell
