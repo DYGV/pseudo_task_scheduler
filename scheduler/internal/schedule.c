@@ -192,7 +192,7 @@ static void add_ready_queue(struct TCB* node) {
 /**
  * readyキューからタスクを取り出し、RUN状態にする関数
  * @param void
- * @ready struct TCB* readyキューの先頭
+ * @return struct TCB* readyキューの先頭
  */
 static struct TCB* pop_ready_queue(void) {
     struct TCB* node;
