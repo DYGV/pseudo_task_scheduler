@@ -1,7 +1,4 @@
-/**
- * @file tcb.h
- */
-
+//! @file tcb.h
 #pragma once
 
 #define READY 1

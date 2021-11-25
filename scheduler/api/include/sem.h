@@ -1,7 +1,4 @@
-/**
- * @file sem.h
- */
-
+//! @file sem.h
 #pragma once
 
 typedef unsigned int sem_t;

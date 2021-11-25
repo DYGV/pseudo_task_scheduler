@@ -1,13 +1,10 @@
-/**
- * @file queue.h
- */
+//! @file queue.h
 #pragma once
 
-struct TCB;
+struct TCB; // opaque(tcb.hで定義)
 struct Queue {
     struct TCB* head;
     struct TCB* tail;
-    //! 空かどうかの確認などに使う
     size_t size;
 };
 

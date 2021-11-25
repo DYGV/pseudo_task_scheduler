@@ -1,7 +1,4 @@
-/**
- * @file queue.c
- */
-
+//! @file queue.c
 #include <stdio.h>
 #include <queue.h>
 #include <tcb.h>

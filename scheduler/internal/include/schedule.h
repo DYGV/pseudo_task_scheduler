@@ -1,6 +1,5 @@
-/**
- * @file schedule.h
- */
+//! @file schedule.h
+
 void register_as_task(void(* task)(void));
 void schedule(void);
 void __sem_init(unsigned int* sem);

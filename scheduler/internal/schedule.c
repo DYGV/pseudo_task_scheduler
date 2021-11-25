@@ -1,9 +1,6 @@
-/**
- * @file schedule.c
- */
+//! @file schedule.c
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <tcb.h>
 #include <queue.h>
 
@@ -15,7 +12,7 @@ static struct semaphore* search_semaphore(unsigned int* sem);
 
 //! 内部処理用のセマフォ構造体
 struct semaphore {
-    //! セマフォ
+    //! セマフォのアドレスを入れておくため
     unsigned int* sem;
     //! そのsemにおけるwaitキュー
     struct Queue wait_queue;
@@ -50,10 +47,10 @@ void register_as_task(void(* task)(void)) {
  * スケジューラを呼ぶ関数
  * @param void
  * @return void
-*/
+ */
 void schedule(void) {
-    //while(1){
-    for (int i = 0; i < 12; i++) {
+    // 終了できるように適当な回数で呼ぶ
+    for (size_t i = 0; i < 12; i++) {
         __schedule();
     }
 }
@@ -64,8 +61,7 @@ void schedule(void) {
  * @return void
  */
 static void __schedule(void) {
-    // readyが空かつwaitが空でないとき = 起きていて走らせられるタスクがない
-    // アイドルタスクを動かす
+    // readyキューが空で動かせるタスクがないときはアイドルタスクを動かす
     // 今回はセマフォを解放するタスクをアイドルタスクとする
     while (((running = pop_ready_queue()) == NULL) && sleeper > 0) {
         printf("No task to run. Try to wakeup all task.\n");
@@ -78,6 +74,31 @@ static void __schedule(void) {
     if (running->state == RUN) {
         add_ready_queue(running);
     }
+}
+
+/**
+ * セマフォを初期化する関数
+ * 内部用の構造体を作り、管理できるようにする
+ * @param unsigned int* sem 新しく作りたいセマフォ
+ * @return void
+ */
+void __sem_init(unsigned int* sem) {
+    struct semaphore* new_sem;
+    // セマフォごとにstruct semaphoreの領域を確保する
+    if ((new_sem = (struct semaphore*)calloc(1, sizeof(struct semaphore))) == NULL) {
+        perror("calloc");
+        exit(1);
+    }
+    new_sem->sem = sem;
+    new_sem->next = NULL;
+    if (isem == NULL) {
+        isem = new_sem;
+        isem_head = new_sem;
+        return;
+    }
+    isem->next = new_sem;
+    // 変数をnextに更新する(先頭ポインタはグローバル変数で保持しているから大丈夫)
+    isem = isem->next;
 }
 
 /**
@@ -110,6 +131,7 @@ void __wake_up(unsigned int* sem) {
     if (tcb == NULL) {
         return;
     }
+
     // 今回はwaitからreadyに行くものとする
     add_ready_queue(tcb);
     // 起こしたのでsleeperを減らす
@@ -135,42 +157,17 @@ void __sleep_on(unsigned int* sem) {
 }
 
 /**
- * セマフォを初期化する関数
- * 内部用の構造体を作り、管理できるようにする
- * @param unsigned int* sem 新しく作りたいセマフォ
- * @return void
- */
-void __sem_init(unsigned int* sem) {
-    struct semaphore* new_sem;
-    // セマフォごとにstruct semaphoreの領域を確保する
-    if ((new_sem = (struct semaphore*)calloc(1, sizeof(struct semaphore))) == NULL) {
-        perror("calloc");
-        exit(1);
-    }
-    new_sem->sem = sem;
-    new_sem->next = NULL;
-    if(isem == NULL){
-        isem = new_sem;
-        isem_head = new_sem;
-        return;
-    }
-    isem->next = new_sem;
-    // 変数をnextに更新する(先頭ポインタはグローバル変数で保持しているから大丈夫)
-    isem = isem->next;
-}
-
-/**
  * アイドルタスク
  * 今回はセマフォを強制的に解放するタスク
  * @param void
  * @return void
+ * @attention 動作するが、効率が悪い。idle()内でstruct semaphoreに関するループがあり、また__wake_up関数を呼ぶと探索があるので、走査が2回起きてしまう(改善の余地あり)。@sa __wake_up
  */
 static void idle(void) {
-    // 強制的にセマフォを解放して起こす
     struct semaphore* concerned_sem = (struct semaphore*)isem_head;
-    // struct semaphoreについて
+    // struct semaphoreについてのループ
     while (concerned_sem != NULL) {
-        // struct semaphoreのウェイトキューについて
+        // struct semaphoreのウェイトキューについてのループ
         while (concerned_sem->wait_queue.size != 0) {
             __wake_up(concerned_sem->sem);
         }
@@ -185,7 +182,7 @@ static void idle(void) {
  * @return void
  */
 static void add_ready_queue(struct TCB* node) {
-    if(node == NULL){
+    if (node == NULL) {
         return;
     }
     node->state = READY;

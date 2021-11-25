@@ -1,7 +1,4 @@
-/**
- * @file tcb.c
- */
-
+//! @file tcb.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <tcb.h>
