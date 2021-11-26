@@ -43,7 +43,7 @@ void Task1() {
 }
 
 int main(void) {
-    // セマフォsemを1で初期化
+    // 1で初期化
     if (sem_init(&sem_1, 1) == -1 || sem_init(&sem_2, 1) == -1) {
         perror("sem_init");
         exit(1);

@@ -37,7 +37,7 @@ void Task1() {
 }
 
 int main(void) {
-    // セマフォsemを1で初期化
+    // 1で初期化
     if (sem_init(&mutex, 1) == -1) {
         perror("sem_init");
         exit(1);
