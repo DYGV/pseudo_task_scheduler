@@ -12,7 +12,7 @@ void Task0() {
     static int pc = 0;
     int ret = 0;
     ret = sem_wait(&mutex);
-        printf(ret == 1 ? "Task0 could get a token.\n" : "Task0 could not get a token.\n");
+    printf(ret == 1 ? "Task0 could get a token.\n" : "Task0 could not get a token.\n");
     pc++;
 }
 
