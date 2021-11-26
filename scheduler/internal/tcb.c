@@ -6,7 +6,7 @@
 /**
  * TCBの新しい要素を生成する関数
  * @param int id タスクID
- * @param void(*task)() run_task_on_RR_method()内で動かしたい戻り値がint型の関数ポインタ
+ * @param void(*task)() 動かしたい関数ポインタ
  * @return 新しく確保したstruct TCBの先頭アドレスへのポインタ
  */
 struct TCB* make_TCB_node(const int id, void(*task)(void)) {

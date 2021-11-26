@@ -29,7 +29,7 @@ void Task1() {
         printf("Task1 tries to release a token.\n");
         ret = sem_post(&mutex);
     } else if (pc == 2) {
-        printf("Hello from B\n");
+        printf("Hello from Task1\n");
     }
     if (ret == 1) {
         pc++;
