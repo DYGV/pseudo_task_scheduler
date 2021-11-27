@@ -24,3 +24,6 @@ $(OBJDIR)/%.o: %.c
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
+
+code_format:
+	astyle --style=1tbs -s4 -S -N -Y -M80 -p -j -k1 -U -H -A2 --recursive *.c *.h
