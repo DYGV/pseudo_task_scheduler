@@ -28,8 +28,6 @@ static struct Queue ready_queue = {0};
 static struct semaphore* isem;
 //! isemの先頭アドレスの保持用変数
 static struct semaphore* isem_head;
-//! 眠っているタスクの総数
-static int sleeper = 0;
 
 /**
  * 関数をもらい、構造体TCBを作ってenqueueする関数(タスクの登録時に使う)
@@ -63,7 +61,7 @@ void schedule(void) {
 static void __schedule(void) {
     // readyキューが空で動かせるタスクがないときはアイドルタスクを動かす
     // 今回はセマフォを解放するタスクをアイドルタスクとする
-    while (((running = pop_ready_queue()) == NULL) && sleeper > 0) {
+    while (((running = pop_ready_queue()) == NULL)) {
         printf("No task to run. Try to wakeup all task.\n");
         idle();
         printf("ok. Released all semaphore.\n");
@@ -126,10 +124,6 @@ static struct semaphore* search_semaphore(unsigned int* sem) {
  * @return void
  */
 void __wake_up(unsigned int* sem) {
-    // どのセマフォ上でもwait状態にあるタスクがない
-    if (sleeper == 0) {
-        return;
-    }
     // 該当のセマフォを探す
     struct semaphore* concerned_sem = search_semaphore(sem);
     if (concerned_sem == NULL) {
@@ -143,8 +137,6 @@ void __wake_up(unsigned int* sem) {
     }
     // 今回はwaitからreadyに行くものとする
     add_ready_queue(tcb);
-    // 起こしたのでsleeperを減らす
-    sleeper--;
     printf("Task%dを状態%dへ遷移\n", tcb->id, tcb->state);
 }
 
@@ -163,8 +155,6 @@ void __sleep_on(unsigned int* sem) {
     running->state = WAIT;
     // 該当のセマフォのウェイトキューへTCBを入れる
     push_back(&concerned_sem->wait_queue, running);
-    // 眠らせたのでsleeperを増やす
-    sleeper++;
     printf("Task%dを状態%dへ遷移\n", running->id, running->state);
 }
 
