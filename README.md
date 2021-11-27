@@ -2,8 +2,36 @@
 ### Clone this repository  
 ```shell
 git clone https://github.com/DYGV/task_scheduler.git
-cd task_scheduler
+cd task_scheduler/
 ```
+<details>
+<summary>Directory Tree</summary>
+
+```
+.
+├── Doxyfile
+├── Makefile
+├── README.md
+└── scheduler
+    ├── api
+    │   ├── include
+    │   │   └── sem.h
+    │   └── sem.c
+    ├── internal
+    │   ├── include
+    │   │   ├── queue.h
+    │   │   ├── schedule.h
+    │   │   └── tcb.h
+    │   ├── queue.c
+    │   ├── schedule.c
+    │   └── tcb.c
+    ├── multi_sem.c
+    ├── multi_sem_idle.c
+    ├── single_sem.c
+    └── single_sem_idle.c
+```
+</details>
+
 ## Build
 ### Use make command  
 ```shell
