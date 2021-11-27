@@ -104,14 +104,19 @@ void __sem_init(unsigned int* sem) {
 /**
  * struct semaphoreをsemで線形探索する関数
  * @param unsigned int* sem 探索したいセマフォのポインタ
- * @return struct semaphore* 検索結果
+ * @return struct semaphore* 一致するセマフォがあればその構造体のポインタ、なければNULL
  */
 static struct semaphore* search_semaphore(unsigned int* sem) {
     struct semaphore* concerned_sem = isem_head;
-    while (concerned_sem != NULL && concerned_sem->sem != sem) {
+    while (1) {
+        if (concerned_sem == NULL) {
+            return NULL;
+        }
+        if (concerned_sem->sem == sem) {
+            return concerned_sem;
+        }
         concerned_sem = concerned_sem->next;
     }
-    return concerned_sem;
 }
 
 /**
@@ -121,17 +126,21 @@ static struct semaphore* search_semaphore(unsigned int* sem) {
  * @return void
  */
 void __wake_up(unsigned int* sem) {
+    // どのセマフォ上でもwait状態にあるタスクがない
     if (sleeper == 0) {
         return;
     }
     // 該当のセマフォを探す
     struct semaphore* concerned_sem = search_semaphore(sem);
-    // 該当のセマフォのウェイトキューからTCBを取り出す
+    if (concerned_sem == NULL) {
+        return;
+    }
+    // 該当のセマフォのウェイトキューからTCBを取り出そうとする
     struct TCB* tcb = pop_front(&concerned_sem->wait_queue);
+    // そのセマフォ上でwait状態にあるタスクがないなら
     if (tcb == NULL) {
         return;
     }
-
     // 今回はwaitからreadyに行くものとする
     add_ready_queue(tcb);
     // 起こしたのでsleeperを減らす
@@ -147,6 +156,9 @@ void __wake_up(unsigned int* sem) {
 void __sleep_on(unsigned int* sem) {
     // 該当のセマフォを探す
     struct semaphore* concerned_sem = search_semaphore(sem);
+    if (concerned_sem == NULL) {
+        return;
+    }
     // 状態を更新する
     running->state = WAIT;
     // 該当のセマフォのウェイトキューへTCBを入れる

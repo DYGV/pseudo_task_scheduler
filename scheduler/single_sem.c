@@ -15,7 +15,7 @@ void Task0() {
         printf(ret == 1 ? "Task0 could get a token.\n" : "Task0 could not get a token.\n");
     } else if (pc == 1) {
         printf("Task0 tries to release a token.\n");
-       ret = sem_post(&mutex);
+        ret = sem_post(&mutex);
     } else if (pc == 2) {
         printf("Hello from Task0\n");
     }

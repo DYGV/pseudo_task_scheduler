@@ -17,7 +17,7 @@ void Task0() {
     } else if (pc == 1) {
         ret = sem_wait(&sem_2);
         printf(ret == 1 ? "Task0 could get a token(sem_2).\n" : "Task0 could not get a token(sem_2).\n");
-    } else if(pc == 2) {
+    } else if (pc == 2) {
         printf("Hello from Task0.\n");
     }
     if (ret == 1) {
@@ -34,7 +34,7 @@ void Task1() {
     } else if (pc == 1) {
         ret = sem_wait(&sem_1);
         printf(ret == 1 ? "Task1 could get a token(sem_1).\n" : "Task1 could not get a token(sem_1).\n");
-    } else if(pc ==2) {
+    } else if (pc == 2) {
         printf("Hello from Task1.\n");
     }
     if (ret == 1) {
