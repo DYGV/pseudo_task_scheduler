@@ -3,34 +3,19 @@ INCLUDE = -I./scheduler/api/include -I./scheduler/internal/include
 CFLGAGS = -Wall -g $(INCLUDE)
 OBJDIR = ./obj
 BINDIR = ./bin
-APP_1 = single_sem
-APP_2 = single_sem_idle
-APP_3 = multi_sem
-APP_4 = multi_sem_idle
-
-T_APP_1 := $(BINDIR)/$(APP_1)
-T_APP_2 := $(BINDIR)/$(APP_2)
-T_APP_3 := $(BINDIR)/$(APP_3)
-T_APP_4 := $(BINDIR)/$(APP_4)
-
 SRCROOT = ./scheduler
 SRCDIRS := $(SRCROOT)/api $(SRCROOT)/internal
-SRCS = $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.c))
-OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.c=.o)) 
 
-all: $(T_APP_1) $(T_APP_2) $(T_APP_3) $(T_APP_4)
+DEPS = $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.c))
+OBJS = $(addprefix $(OBJDIR)/, $(DEPS:.c=.o)) 
 
-$(T_APP_1): $(OBJS)
-	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_1).c
+APPS = single_sem single_sem_idle multi_sem multi_sem_idle
+BINS = $(addprefix $(BINDIR)/, $(APPS))
 
-$(T_APP_2): $(OBJS)
-	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_2).c
+all: $(BINS)
 
-$(T_APP_3): $(OBJS)
-	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_3).c
-
-$(T_APP_4): $(OBJS)
-	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(APP_4).c
+$(BINS): $(OBJS)
+	$(CC) $(CFLGAGS) -o $@ $^ $(SRCROOT)/$(notdir $@).c
 
 $(OBJDIR)/%.o: %.c
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
